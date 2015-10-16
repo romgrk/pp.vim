@@ -19,7 +19,7 @@ P [1, 2, '3', {'a': 4}], function('search')
 P pp
 ```
 
-![alt text](./pp_self.png "")
+![alt text](./pp_self2.png "")
 
 ## Settings
 
@@ -53,8 +53,12 @@ call pp.dump(obj, depth)
 ### autoload:
 
 `pp#()` : returns `pp` dict
+
 `pp#print()`: `P` command callback
+
 `pp#dump(obj)`: prints `obj` (depth=2)
+
 `pp#theme()`: returns current theme
+
 `pp#theme(t)`: sets `pp['theme']` to `t`
 
