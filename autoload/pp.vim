@@ -39,8 +39,8 @@ let pp = {'loaded': 1, 'string as :: key': function('search')}
 let pp.theme = s:init_theme()
 "let pp.FS = ",\t"
 "let pp.RS = "\n"
-let pp.FS = ", \t"
-let pp.RS = "\t\t"
+let pp.FS = ", "
+let pp.RS = "\t"
 
 let s:types  = s:init_types()
 
@@ -74,10 +74,10 @@ fu! pp#print (...)
     call pp#()._('Comment', ' => ')
     for i in range(a:0)
         call pp#dump(a:000[i])
-        "if (a:0 > 1 && i < a:0 - 1)
-            "call self.sep()
+        if (a:0 > 1 && i < a:0 - 1)
+            call pp#().sep()
             "call pp#()._('Comment', ",\t")
-        "end
+        end
     endfor
     catch /.*/ | call s:hl('TextError', v:exception) | endtry
 endfu
