@@ -34,7 +34,6 @@ fu! s:init_theme ()
     let theme['Float']           = 'Number'
     let theme['Function']        = 'Function'
     let theme['FuncIdentifier']  = 'Identifier'
-
     let theme['List']            = 'Enum'
     let theme['Dict']            = 'Structure'
     let theme['SpecialChar']     = 'SpecialChar'
@@ -51,7 +50,6 @@ end
 
 if !exists("pp['theme']")
     let pp.theme = s:init_theme() | end
-
 
 let pp['loaded'] = 1
 
@@ -92,7 +90,12 @@ endfu
 " PP_object:
 fu! pp._ (group, text) dict
     let group = get(self.theme, a:group, a:group)
-    call s:hl(group, a:text)
+    if type(a:text) != 1
+        let text = string(a:text)
+    else
+        let text = a:text
+    end
+    call s:hl(group, text)
 endfu
 fu! pp.tokens(str) dict
     let tokens = split(a:str, '\<\|\>\|\(''\|"\|\W\)\@=')
@@ -257,6 +260,8 @@ fu! pp.dump (Object, ...) dict
     let t = s:type(Object)
     if t == 'Number'
         call self._(t, Object)    | end
+    if t == 'Float'
+        call self._(t, Object) | end
     if t == 'String'
         call self.string(Object)  | end
     if t == 'Function'
