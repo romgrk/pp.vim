@@ -13,7 +13,8 @@ let g:loaded_pp = 1
 if !exists('g:pp') || exists('debug') | let g:pp = {} | end
 
 " PP command
-com! -nargs=* -complete=expression P call pp#print(<args>)
+com! -nargs=* -complete=expression P     call pp#print(<args>)
+com! -nargs=* -complete=expression Print call pp#print(<args>)
 
 fu! s:init_types ()
     let types = [0, 1, 2, 3, 4, 5]
@@ -86,6 +87,16 @@ fu! s:hl_tokens (tokens)
         call self._(t[0], t[1])
     endfor
 endfu
+fu! s:hi (gr)
+    exe 'hi ' . a:gr[4] .
+        \' guifg=' . a:gr[0] .
+        \ (empty(a:gr[1]) ? '' : ' guibg=' . a:gr[1]) .
+        \ (empty(a:gr[2]) ? '' : ' gui=' . a:gr[2]) .
+        \ (empty(a:gr[2]) ? '' : ' cterm=' . a:gr[2]) .
+        \' ctermfg=' . a:gr[3]
+endfu
+
+let pp.scope = s:
 
 " PP_object:
 fu! pp._ (group, text) dict
@@ -127,14 +138,18 @@ endfu
 fu! pp.brace(char) dict
     call self._('Delimiter', a:char)
 endfu
-fu! pp.delimiter(start, Obj, end) dict
+
+fu! pp.delimited(start, Obj, end) dict
     call self._('Delimiter', a:start)
     let Obj = a:Obj
     if s:type(Obj) == 'List'
         call self._(Obj[0], Obj[1])
     elseif s:type(Obj) == 'Function'
-        call Obj()
+        "call Obj()
+        echon Obj()
     elseif s:type(Obj) == 'String'
+        call Echon(Obj)
+    else
         call Echon(Obj)
     end
     call self._('Delimiter', a:end)
