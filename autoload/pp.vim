@@ -12,18 +12,6 @@ fu! pp# (...)
     end
 endfu
 
-" create the hlGroup @group
-fu! pp#hi (group, ...)
-    let bang = get(a:, 'bang', (a:0 > 0 ? a:1 : 0))
-    exe 'hi' . (bang ? '! ' : ' ') . a:group[4] .
-        \' guifg=' . a:group[0] .
-        \ (empty(a:group[1]) ? '' : ' guibg=' . a:group[1]) .
-        \ (empty(a:group[2]) ? '' : ' gui=' . a:group[2]) .
-        \ (empty(a:group[2]) ? '' : ' cterm=' . a:group[2]) .
-        \' ctermfg=' . a:group[3]
-endfu
-
-
 " prints whatever it receives as argument
 fu! pp#print (...)
     try
@@ -81,6 +69,17 @@ fu! pp#group (hl)
     return get(g:pp['theme'], a:hl, a:hl)
 endfu
 
+" create the hlGroup @group
+fu! pp#hi (group, ...)
+    let bang = get(a:, 'bang', (a:0 > 0 ? a:1 : 0))
+    exe 'hi' . (bang ? '! ' : ' ') . a:group[4] .
+        \' guifg=' . a:group[0] .
+        \ (empty(a:group[1]) ? '' : ' guibg=' . a:group[1]) .
+        \ (empty(a:group[2]) ? '' : ' gui=' . a:group[2]) .
+        \ (empty(a:group[2]) ? '' : ' cterm=' . a:group[2]) .
+        \' ctermfg=' . a:group[3]
+endfu
+
 " get/set the theme
 fu! pp#theme (...)
     if (a:0)
@@ -90,6 +89,7 @@ fu! pp#theme (...)
     end
 endfu
 
+" creates the pretty theme
 fu! pp#prettyTheme ()
     let theme = {}
     let theme['Name']            = 'ppNormal'

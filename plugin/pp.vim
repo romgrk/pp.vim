@@ -8,13 +8,15 @@ let s:debug = exists('g:debug')
 
 if exists('g:loaded_pp') && !s:debug
     finish | end
+
 let g:loaded_pp = 1
 
-if !exists('g:pp') || exists('debug') | let g:pp = {} | end
-
-" PP command
-com! -nargs=* -complete=expression P     call pp#print(<args>)
+" PP commands
+com! -nargs=* -complete=expression Pp    call pp#print(<args>)
 com! -nargs=* -complete=expression Print call pp#print(<args>)
+
+" Object setup
+if !exists('g:pp') || exists('debug') | let g:pp = {} | end
 
 fu! s:init_types ()
     let types = [0, 1, 2, 3, 4, 5]
@@ -26,7 +28,6 @@ fu! s:init_types ()
     let types[5] = 'Float'
     return types
 endfu
-
 fu! s:init_theme ()
     let theme = {}
     let theme['Name']            = 'Normal'
@@ -35,7 +36,8 @@ fu! s:init_theme ()
     let theme['Float']           = 'Number'
     let theme['Function']        = 'Function'
     let theme['FuncIdentifier']  = 'Identifier'
-    let theme['List']            = 'Enum'
+    "let theme['List']            = 'Enum'      <= not really standard
+    let theme['List']            = 'Constant'
     let theme['Dict']            = 'Structure'
     let theme['SpecialChar']     = 'SpecialChar'
     let theme['Separator']       = 'Comment'
@@ -44,24 +46,23 @@ fu! s:init_theme ()
     return theme
 endfu
 
+" 1. set theme via a global func
 if exists('*PPtheme') | try
     let pp.theme = PPtheme()
-    catch /.*/ | endtry
-end
+catch /.*/ | endtry | end
 
-if !exists("pp['theme']")
+" 2. check if theme isnt already set
+if !exists("pp.theme")
     let pp.theme = s:init_theme() | end
 
-let pp['loaded'] = 1
-
-" FieldSeparator, RecordSeparator
-let pp.FS = ", "
-let pp.RS = "\t"
+" Properties
+let pp.FS = ", "  " FieldSeparator
+let pp.RS = "\t"  " RecordSeparator
 
 " Funny highlighting targets
+let pp['loaded']     = 1
 let pp['str :: key'] = function('search')
 let pp['funky list'] = [0.1, 0.46666, 99, 'halua bouaboua']
-
 
 " Script:
 
@@ -77,26 +78,14 @@ fu! s:write (value)
     exe 'echon "' . string(a:value) . '"'
 endfu
 fu! s:hl (group, text)
-    let text = escape(a:text, '"\')
     exe ':echohl ' . a:group
-    exe ':echon "' . text . '"'
-    return 1
+    exe ':echon "' . escape(a:text, '"\') . '"'
 endfu
 fu! s:hl_tokens (tokens)
     for t in tokens
         call self._(t[0], t[1])
     endfor
 endfu
-fu! s:hi (gr)
-    exe 'hi ' . a:gr[4] .
-        \' guifg=' . a:gr[0] .
-        \ (empty(a:gr[1]) ? '' : ' guibg=' . a:gr[1]) .
-        \ (empty(a:gr[2]) ? '' : ' gui=' . a:gr[2]) .
-        \ (empty(a:gr[2]) ? '' : ' cterm=' . a:gr[2]) .
-        \' ctermfg=' . a:gr[3]
-endfu
-
-let pp.scope = s:
 
 " PP_object:
 fu! pp._ (group, text) dict
