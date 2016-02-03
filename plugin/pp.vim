@@ -28,7 +28,7 @@ fu! s:init_types ()
     let types[5] = 'Float'
     return types
 endfu
-fu! s:init_theme ()
+fu! s:init_theme()
     let theme = {}
     let theme['Name']            = 'Normal'
     let theme['String']          = 'String'
@@ -56,8 +56,8 @@ if !exists("pp.theme")
     let pp.theme = s:init_theme() | end
 
 " Properties
-let pp.FS = ", "  " FieldSeparator
-let pp.RS = "\t"  " RecordSeparator
+let pp.FS = ",\t"  " FieldSeparator
+let pp.RS = "\n"   " RecordSeparator
 
 " Funny highlighting targets
 let pp['loaded']     = 1
@@ -134,8 +134,10 @@ fu! pp.delimited(start, Obj, end) dict
     if s:type(Obj) == 'List'
         call self._(Obj[0], Obj[1])
     elseif s:type(Obj) == 'Function'
-        "call Obj()
-        echon Obj()
+        let res = Obj()
+        if !empty(res)
+            echon res
+        end
     elseif s:type(Obj) == 'String'
         call Echon(Obj)
     else

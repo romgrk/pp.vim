@@ -31,7 +31,7 @@ fu! pp#dump (Obj)
     call pp#().dump(a:Obj, 2)
 endfu
 
-" prints without newline 
+" prints without newline
 " 1. the group&text : (group, text)     OR
 " 2. the list of group&text : ([group, text], [group2, text2], ...)
 fu! pp#echo (...)
@@ -52,6 +52,10 @@ endfu
 " Alias for pp#echo
 fu! pp#hl (...)
     call call('pp#echo', a:000)
+endfu
+
+fu! pp#sep (str)
+    call g:pp.sep(a:str)
 endfu
 
 " echoes without newline the group&text
