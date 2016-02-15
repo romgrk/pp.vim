@@ -12,6 +12,7 @@ if exists('g:loaded_pp') && !s:debug
 let g:loaded_pp = 1
 
 " PP commands
+com! -nargs=* -complete=expression P     call pp#print(<args>)
 com! -nargs=* -complete=expression Pp    call pp#print(<args>)
 com! -nargs=* -complete=expression Print call pp#print(<args>)
 
@@ -56,8 +57,8 @@ if !exists("pp.theme")
     let pp.theme = s:init_theme() | end
 
 " Properties
-let pp.FS = ",\t"  " FieldSeparator
-let pp.RS = "\n"   " RecordSeparator
+let pp.FS = ", " " ,\t   FieldSeparator
+let pp.RS = "\n"  " \n    RecordSeparator
 
 " Funny highlighting targets
 let pp['loaded']     = 1
