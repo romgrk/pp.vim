@@ -1,30 +1,27 @@
-
-
 # *pp.vim* - pretty printer
-==========================-
+===========================
 
-`command! P`
-Use it as you would use `echo`. (! but with a comma separated list)
+> A better echo
 
-e.g.:
+`command! Pp [args...]`
+
+Where **args** is a comma-separated list of vim expressions that will be eveluated.
+You can also use it as a replacement for `call` command, it will show a pretty
+return value.
+
 ```viml
-P [1, 2, '3', {'a': 4}], function('search')
+" An example:
+Pp [1, 2, '3', {'a': 4}], function('search'), "special\nchar"
 ```
-
 ![alt text](./pp_demo.png "")
 
-*pp.vim* defines the global dict `pp`, which contains the functions for printing/parsing.
+**pp.vim** defines the global dict `pp`, which contains the functions for printing/parsing.
 
 ```viml
-P pp
+Pp pp
 ```
 
 ![alt text](./pp_self2.png "")
-
-You can also use it as a replacement for `call`.
-```viml
-P setline('.', 'A line.')
-```
 
 ## Settings
 
@@ -55,25 +52,30 @@ let theme['StringDelimiter'] = 'StringDelimiter'
 
 You can also get the pretty theme by calling `pp#prettyTheme()`.
 
-### more:
+### Functionnal
 
-Calling `pp` function:
+- `pp#()` : returns `pp` dict
+
+- `pp#print(...)`: the function called by `Pp` command
+
+- `pp#dump(obj[, depth=2])`: prints `obj` 
+
+- `pp#theme()`: returns current theme
+
+- `pp#theme(t)`: sets `pp['theme']` to `t`
+
+Calling `pp` object functions:
 ```viml
 let obj   = {'some': {'object': {'very': {'deeply': 'recursive'}}}}
 let depth = 4
 call pp.dump(obj, depth)
-" (P default's is depth=2)
+" (Pp command default is depth=2)
 ```
 
-### autoload:
-
-`pp#()` : returns `pp` dict
-
-`pp#print(...)`: `P` command
-
-`pp#dump(obj[, depth=2])`: prints `obj` 
-
-`pp#theme()`: returns current theme
-
-`pp#theme(t)`: sets `pp['theme']` to `t`
+```viml
+" Don't tell anyone, but if ever you need to print a message 
+" with highlight:
+call pp._('Keyword', 'text to print')
+```
+![alt text](./secret.png "")
 
