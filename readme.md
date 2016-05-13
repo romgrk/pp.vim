@@ -11,14 +11,14 @@ return value.
 
 ```viml
 " An example:
-Pp [1, 2, '3', {'a': 4}], function('search'), "special\nchar"
+:Pp [1, 2, '3', {'a': 4}], function('search'), "special\nchar"
 ```
 ![alt text](./pp_demo.png "")
 
-**pp.vim** defines the global dict `pp`, which contains the functions for printing/parsing.
+**pp.vim** defines the global dict `g:pp`, which contains the functions for printing/parsing.
 
 ```viml
-Pp pp
+:Pp g:pp
 ```
 
 ![alt text](./pp_self2.png "")
