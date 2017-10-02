@@ -6,7 +6,7 @@
 `command! Pp [args...]`
 
 Where **args** is a comma-separated list of vim expressions that will be eveluated.
-You can also use it as a replacement for `call` command, it will show a pretty
+You can also use it as nnoremap <CR> i<CR><Esc>|replacement for `call` command, it will show a pretty
 return value.
 
 ```viml

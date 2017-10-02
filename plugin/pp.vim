@@ -4,12 +4,12 @@
 " Date: 16 Oct 2015
 " !::exe [so %]
 
-let s:debug = exists('g:debug')
-
-if exists('g:loaded_pp') && !s:debug
+if exists('g:did_loaded_pp') && !get(g:, 'debug')
     finish | end
+let g:did_loaded_pp = 1
 
-let g:loaded_pp = 1
+if get(g:, 'debug', 0)
+    unlet! g:pp | end
 
 " PP commands
 com! -nargs=* -complete=expression P     call pp#print(<args>)
@@ -17,20 +17,23 @@ com! -nargs=* -complete=expression Pp    call pp#print(<args>)
 com! -nargs=* -complete=expression Print call pp#print(<args>)
 
 " Object setup
-if !exists('g:pp') || exists('debug') | let g:pp = {} | end
+let g:pp = {}
 
 fu! s:init_types ()
-    let types = [0, 1, 2, 3, 4, 5]
-    let types[0] = 'Number'
-    let types[1] = 'String'
-    let types[2] = 'Function'
-    let types[3] = 'List'
-    let types[4] = 'Dict'
-    let types[5] = 'Float'
+    let types                    = range(8)
+    let types[0]                 = 'Number'
+    let types[1]                 = 'String'
+    let types[2]                 = 'Function'
+    let types[3]                 = 'List'
+    let types[4]                 = 'Dict'
+    let types[5]                 = 'Float'
+    let types[6]                 = 'Boolean'
+    let types[7]                 = 'Null'
     return types
 endfu
+
 fu! s:init_theme()
-    let theme = {}
+    let theme                    = {}
     let theme['Name']            = 'Normal'
     let theme['String']          = 'String'
     let theme['Number']          = 'Number'
@@ -40,10 +43,13 @@ fu! s:init_theme()
     "let theme['List']            = 'Enum'      <= not really standard
     let theme['List']            = 'Constant'
     let theme['Dict']            = 'Structure'
+    let theme['Boolean']         = 'Boolean'
+    let theme['Null']            = 'Comment'
     let theme['SpecialChar']     = 'SpecialChar'
     let theme['Separator']       = 'Comment'
     let theme['Delimiter']       = 'Delimiter'
     let theme['StringDelimiter'] = 'StringDelimiter'
+    hi def link Null Comment
     return theme
 endfu
 
@@ -60,32 +66,13 @@ if !exists("pp.theme")
 let pp.FS = ", " " ,\t   FieldSeparator
 let pp.RS = "\n"  " \n    RecordSeparator
 
-" Funny highlighting targets
-let pp['loaded']     = 1
-let pp['str :: key'] = function('search')
-let pp['funky list'] = [0.1, 0.46666, 99, 'halua bouaboua']
 
 " Script:
 
 let s:types  = s:init_types()
 
-fu! s:type(obj)
+fu! pp.type(obj)
     return s:types[type(a:obj)]
-endfu
-fu! s:print (value)
-    exe 'echo "' . string(a:value) . '"'
-endfu
-fu! s:write (value)
-    exe 'echon "' . string(a:value) . '"'
-endfu
-fu! s:hl (group, text)
-    exe ':echohl ' . a:group
-    exe ':echon "' . escape(a:text, '"\') . '"'
-endfu
-fu! s:hl_tokens (tokens)
-    for t in tokens
-        call self._(t[0], t[1])
-    endfor
 endfu
 
 " PP_object:
@@ -96,7 +83,8 @@ fu! pp._ (group, text) dict
     else
         let text = a:text
     end
-    call s:hl(group, text)
+    exe 'echohl ' . group
+    exe 'echon "' . escape(text, '"\') . '"'
 endfu
 fu! pp.tokens(str) dict
     let tokens = split(a:str, '\<\|\>\|\(''\|"\|\W\)\@=')
@@ -128,18 +116,17 @@ endfu
 fu! pp.brace(char) dict
     call self._('Delimiter', a:char)
 endfu
-
 fu! pp.delimited(start, Obj, end) dict
     call self._('Delimiter', a:start)
     let Obj = a:Obj
-    if s:type(Obj) == 'List'
+    if pp.type(Obj) == 'List'
         call self._(Obj[0], Obj[1])
-    elseif s:type(Obj) == 'Function'
+    elseif pp.type(Obj) == 'Function'
         let res = Obj()
         if !empty(res)
             echon res
         end
-    elseif s:type(Obj) == 'String'
+    elseif pp.type(Obj) == 'String'
         call Echon(Obj)
     else
         call Echon(Obj)
@@ -147,6 +134,7 @@ fu! pp.delimited(start, Obj, end) dict
     call self._('Delimiter', a:end)
 endfu
 
+" Printers:
 fu! pp.regex(expr) dict
     let expr = a:expr
     call self._('Normal', "pattern\t")
@@ -154,7 +142,6 @@ fu! pp.regex(expr) dict
     call self._('Regexp', expr)
     call self._('RegexpDelimiter', '/')
 endfu
-
 fu! pp.color(str) dict
     let hex = tolower(a:str[1:])
     let hlname = 'Color' . hex
@@ -232,7 +219,7 @@ fu! pp.list(list, ...) dict
         call self.brace(' ]')
     else
         "call self._('Comment', '... #')
-        call self.brace('[ ')
+        call self.brace('[ … ')
         call self._('Number', len)
         call self.brace(' ]')
     end
@@ -264,19 +251,23 @@ fu! pp.dump (Object, ...) dict
     " recursive
     let r = a:0 ? a:1 : 0
 
-    let t = s:type(Object)
+    let t = pp.type(Object)
     if t == 'Number'
-        call self._(t, Object)    | end
-    if t == 'Float'
-        call self._(t, Object) | end
-    if t == 'String'
-        call self.string(Object)  | end
-    if t == 'Function'
-        call self.func(Object)    | end
-    if t == 'List'
-        call self.list(Object, r) | end
-    if t == 'Dict'
-        call self.dict(Object, r) | end
-
+        call self._(t, Object)
+    elseif t == 'Float'
+        call self._(t, Object)
+    elseif t == 'Boolean'
+        call self._(t, Object ? 'true' : 'false')
+    elseif t == 'Null'
+        call self._(t, 'null')
+    elseif t == 'String'
+        call self.string(Object)
+    elseif t == 'Function'
+        call self.func(Object)
+    elseif t == 'List'
+        call self.list(Object, r)
+    elseif t == 'Dict'
+        call self.dict(Object, r)
+    end
 endfu
 

@@ -104,6 +104,8 @@ fu! pp#prettyTheme ()
     let theme['FuncIdentifier']  = 'ppFuncIdentifier'
     let theme['List']            = 'ppList'
     let theme['Dict']            = 'ppDict'
+    let theme['Boolean']         = 'ppBoolean'
+    let theme['Null']            = 'ppNull'
     let theme['SpecialChar']     = 'ppSpecialChar'
     let theme['Separator']       = 'ppSeparator'
     let theme['Delimiter']       = 'ppDelimiter'
@@ -115,6 +117,8 @@ fu! pp#prettyTheme ()
     call pp#hi(['#9999f8',  '',  '',      86,   'ppFuncIdentifier'])
     call pp#hi(['#ffaf70',  '',  '',      134,  'ppList'])
     call pp#hi(['#ffb964',  '',  '',      51,   'ppDict'])
+    call pp#hi(['#f5c000',  '',  '',      51,   'ppBoolean'])
+    call pp#hi(['#dc322f',  '',  '',      51,   'ppNull'])
     call pp#hi(['#799d6a',  '',  'bold',  76,   'ppSpecialChar'])
     call pp#hi(['#888888',  '',  '',      45,   'ppSeparator'])
     call pp#hi(['#668799',  '',  '',      77,   'ppDelimiter'])
