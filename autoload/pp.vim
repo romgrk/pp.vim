@@ -14,7 +14,7 @@ endfu
 
 " prints whatever it receives as argument
 fu! pp#print (...)
-    try
+    "try
 
     call pp#()._('Comment', ' => ')
     for i in range(a:0)
@@ -23,7 +23,7 @@ fu! pp#print (...)
             call pp#().sep()
         end
     endfor
-    catch /.*/ | call pp#hl('ErrorMsg', v:exception) | endtry
+    "catch /.*/ | call pp#hl('ErrorMsg', v:exception) | endtry
 endfu
 
 " prints a single object

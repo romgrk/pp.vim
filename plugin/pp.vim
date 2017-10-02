@@ -1,4 +1,4 @@
-" File: pp.vim
+" File: g:pp.vim
 " Author: romgrk
 " Description: pretty print
 " Date: 16 Oct 2015
@@ -55,28 +55,28 @@ endfu
 
 " 1. set theme via a global func
 if exists('*PPtheme') | try
-    let pp.theme = PPtheme()
+    let g:pp.theme = PPtheme()
 catch /.*/ | endtry | end
 
 " 2. check if theme isnt already set
 if !exists("pp.theme")
-    let pp.theme = s:init_theme() | end
+    let g:pp.theme = s:init_theme() | end
 
 " Properties
-let pp.FS = ", " " ,\t   FieldSeparator
-let pp.RS = "\n"  " \n    RecordSeparator
+let g:pp.FS = ", " " ,\t   FieldSeparator
+let g:pp.RS = "\n"  " \n    RecordSeparator
 
 
 " Script:
 
 let s:types  = s:init_types()
 
-fu! pp.type(obj)
+fu! g:pp.type(obj)
     return s:types[type(a:obj)]
 endfu
 
 " PP_object:
-fu! pp._ (group, text) dict
+fu! g:pp._ (group, text) dict
     let group = get(self.theme, a:group, a:group)
     if type(a:text) != 1
         let text = string(a:text)
@@ -86,11 +86,11 @@ fu! pp._ (group, text) dict
     exe 'echohl ' . group
     exe 'echon "' . escape(text, '"\') . '"'
 endfu
-fu! pp.tokens(str) dict
+fu! g:pp.tokens(str) dict
     let tokens = split(a:str, '\<\|\>\|\(''\|"\|\W\)\@=')
     return tokens
 endfu
-fu! pp.escape (char) dict
+fu! g:pp.escape (char) dict
     let esc = {}
     "let esc["\<Tab>"] = '\t'
     "let esc["\<CR>"]  = '\n'
@@ -102,31 +102,31 @@ fu! pp.escape (char) dict
         return strtrans(a:char) | end
 endfu
 
-fu! pp.rsep (...) dict
+fu! g:pp.rsep (...) dict
     let sep = get(a:, 1, self.RS)
     call self._('Separator', sep)
 endfu
-fu! pp.sep (...) dict
+fu! g:pp.sep (...) dict
     let sep = get(a:, 1, self.FS)
     call self._('Separator', sep)
 endfu
-fu! pp.eq() dict
+fu! g:pp.eq() dict
     call self._('Delimiter', ': ')
 endfu
-fu! pp.brace(char) dict
+fu! g:pp.brace(char) dict
     call self._('Delimiter', a:char)
 endfu
-fu! pp.delimited(start, Obj, end) dict
+fu! g:pp.delimited(start, Obj, end) dict
     call self._('Delimiter', a:start)
     let Obj = a:Obj
-    if pp.type(Obj) == 'List'
+    if g:pp.type(Obj) == 'List'
         call self._(Obj[0], Obj[1])
-    elseif pp.type(Obj) == 'Function'
+    elseif g:pp.type(Obj) == 'Function'
         let res = Obj()
         if !empty(res)
             echon res
         end
-    elseif pp.type(Obj) == 'String'
+    elseif g:pp.type(Obj) == 'String'
         call Echon(Obj)
     else
         call Echon(Obj)
@@ -135,14 +135,14 @@ fu! pp.delimited(start, Obj, end) dict
 endfu
 
 " Printers:
-fu! pp.regex(expr) dict
+fu! g:pp.regex(expr) dict
     let expr = a:expr
     call self._('Normal', "pattern\t")
     call self._('RegexpDelimiter', '/')
     call self._('Regexp', expr)
     call self._('RegexpDelimiter', '/')
 endfu
-fu! pp.color(str) dict
+fu! g:pp.color(str) dict
     let hex = tolower(a:str[1:])
     let hlname = 'Color' . hex
     if !hlexists(hlname)
@@ -152,7 +152,7 @@ fu! pp.color(str) dict
     end
     call self._(hlname, '''' . a:str . '''')
 endfu
-fu! pp.string(str) dict
+fu! g:pp.string(str) dict
     if (a:str =~ '\v^#[A-Fa-f0-9]{6}$')
         call self.color(a:str)
         return
@@ -177,13 +177,13 @@ fu! pp.string(str) dict
     if !empty(out) | call self._('String', out) | end
     call self._('StringDelimiter', '''')
 endfu
-fu! pp.property(key) dict
+fu! g:pp.property(key) dict
     let key = a:key
     if key =~ '\v^(\w|_|\k|\i)+$'
         call self._('Name', key) | else
         call self.string(key)    | end
 endfu
-fu! pp.func(Fn) dict
+fu! g:pp.func(Fn) dict
     let str = string(a:Fn)
     let tokens = self.tokens(str)
     let token = ''
@@ -206,7 +206,7 @@ fu! pp.func(Fn) dict
         let token = ''
     endfor
 endfu
-fu! pp.list(list, ...) dict
+fu! g:pp.list(list, ...) dict
     let list = a:list
     let len  = len(list)
     let r    = a:0 ? a:1 : 0
@@ -224,7 +224,7 @@ fu! pp.list(list, ...) dict
         call self.brace(' ]')
     end
 endfu
-fu! pp.dict(obj, ...) dict
+fu! g:pp.dict(obj, ...) dict
     let obj = a:obj
     let r   = a:0 ? a:1 : 0
     if (r > 0)
@@ -245,13 +245,13 @@ fu! pp.dict(obj, ...) dict
     end
 endfu
 
-fu! pp.dump (Object, ...) dict
+fu! g:pp.dump (Object, ...) dict
     " target
     let Object = a:Object
     " recursive
     let r = a:0 ? a:1 : 0
 
-    let t = pp.type(Object)
+    let t = g:pp.type(Object)
     if t == 'Number'
         call self._(t, Object)
     elseif t == 'Float'
